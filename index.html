@@ -209,10 +209,48 @@ window.addEventListener("scroll", () => {
 });
 
 // Form
-document.getElementById("contactForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  alert("🚀 Transmission received. Backend coming next.");
-});
+document
+  .getElementById("contactForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const form = this;
+
+    const name = form.querySelector("input[type='text']").value.trim();
+    const email = form.querySelector("input[type='email']").value.trim();
+    const message = form.querySelector("textarea").value.trim();
+
+    if (!name || !email || !message) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert("🚀 Message sent successfully!");
+        form.reset();
+      } else {
+        console.error(data);
+        alert("Failed to send message");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Network error");
+    }
+  });
+
+
 </script>
 
 </body>
